@@ -77,7 +77,7 @@ fun VersionOptions(
     LaunchedEffect(savedVersionData) {
         name = savedVersionData.name
         customIcon = savedVersionData.customIcon
-        icon = if (customIcon) BitmapFactory.decodeFile("${context.filesDir}/versions/${savedVersionData.installationId}/custom_icon.png") else null
+        icon = if (customIcon) BitmapFactory.decodeFile("${context.getExternalFilesDir(null)}/versions/${savedVersionData.installationId}/custom_icon.png") else null
         imageUri = null
     }
     if (imageUri != null) {
@@ -198,7 +198,7 @@ fun VersionOptions(
                     }
                     TextButton(
                         onClick = {
-                            val iconFile = File("${context.filesDir}/versions/${savedVersionData.installationId}/${
+                            val iconFile = File("${context.getExternalFilesDir(null)}/versions/${savedVersionData.installationId}/${
                                 if (customIcon) "custom_icon" else "default_icon"
                             }.png")
                             val bitmapDrawable: Drawable? = if (customIcon && icon != null) {

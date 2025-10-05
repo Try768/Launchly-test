@@ -255,7 +255,7 @@ fun Main(navHostController: NavHostController) {
             },
             onRemoveVersion = {
                 versionDbHelper.removeVersion(it)
-                val fileToDelete = File(context.filesDir, "versions/$it/")
+                val fileToDelete = File(context.getExternalFilesDir(null), "versions/$it/")
                 if (fileToDelete.exists()) fileToDelete.deleteRecursively()
                 downloadedVersions.remove(downloadedVersions.find { version -> version.installationId == it })
             },
@@ -330,7 +330,7 @@ private fun loadExternalApps(
             if (getPackageInstallSource(context, packageName) == context.packageName) continue
             val versionCode = packageInfo.let { PackageInfoCompat.getLongVersionCode(it) }
             val packageAppName = packageInfo.applicationInfo?.loadLabel(packageManager).toString()
-            saveIconToFile(packageInfo.applicationInfo?.loadIcon(packageManager)!!, File("${context.filesDir}/versions/$packageAppName/default_icon.png"))
+            saveIconToFile(packageInfo.applicationInfo?.loadIcon(packageManager)!!, File("${context.getExternalFilesDir(null)}/versions/$packageAppName/default_icon.png"))
             val appData = SavedVersionData(
                 name = packageAppName,
                 installationId = packageInfo.applicationInfo?.loadLabel(packageManager).toString(),
@@ -653,7 +653,7 @@ fun VersionItemLayout(
                     .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val iconFile = File("${context.filesDir}/versions/${savedVersionData.installationId}/${
+                val iconFile = File("${context.getExternalFilesDir(null)}/versions/${savedVersionData.installationId}/${
                     if (savedVersionData.customIcon) "custom_icon" else "default_icon"
                 }.png")
 
@@ -828,7 +828,7 @@ suspend fun handleVersionAction(
                 updateStatus(Status.DOWNLOADING)
                 downloader.startDownload(
                     urlToFileNameMap,
-                    File("${context.filesDir}/versions/${savedVersionData.installationId}")
+                    File("${context.getExternalFilesDir(null)}/versions/${savedVersionData.installationId}")
                 ) { status ->
                     when (status) {
                         is Downloader.DownloadStatus.OnProgress -> {
@@ -877,7 +877,7 @@ suspend fun handleVersionAction(
         is VersionAction.Install -> {
             println("Installing ${savedVersionData.name}")
             isLoading.value = true
-            val apks = File("${context.filesDir}/versions/${savedVersionData.installationId}/").listFiles { file -> file.isFile && file.name.endsWith(".apk") }
+            val apks = File("${context.getExternalFilesDir(null)}/versions/${savedVersionData.installationId}/").listFiles { file -> file.isFile && file.name.endsWith(".apk") }
             if (apks != null && apks.isNotEmpty()) {
                 val onResult: (SessionResult) -> Unit = {
                     when (it) {
@@ -885,7 +885,7 @@ suspend fun handleVersionAction(
                             installProgress.intValue = it.progress
                         }
                         is SessionResult.OnSuccess -> {
-                            val iconFile = File("${context.filesDir}/versions/${savedVersionData.installationId}/${
+                            val iconFile = File("${context.getExternalFilesDir(null)}/versions/${savedVersionData.installationId}/${
                                 if (savedVersionData.customIcon) "custom_icon" else "default_icon"
                             }.png")
                             installProgress.intValue = -1
